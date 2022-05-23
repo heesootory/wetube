@@ -1,12 +1,14 @@
 import express from "express";
-import { edit, logout, see, startGithubLogin, finishGithubLogin } from "../controllers/userController.js";
+import { logout, see, startGithubLogin, finishGithubLogin, getEdit, postEdit } from "../controllers/userController.js";
+import {protectordMiddleware, publicOnlyMiddleware} from "../middlewares";
 
 const userRouter = express.Router();
 
-userRouter.get("/logout", logout);
-userRouter.get("/edit", edit);
-userRouter.get("/github/start", startGithubLogin);
-userRouter.get("/github/finish", finishGithubLogin);
+userRouter.get("/logout", protectordMiddleware, logout);
+userRouter.route("/edit").all(protectordMiddleware).get(getEdit).post(postEdit);
+userRouter.get("/github/start", publicOnlyMiddleware, startGithubLogin);
+userRouter.get("/github/finish", publicOnlyMiddleware, finishGithubLogin);
+// 로그인 여부에 상관없이 가능할듯함.
 userRouter.get("/:id", see);
 
 export default userRouter;

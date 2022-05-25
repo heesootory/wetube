@@ -11,7 +11,7 @@ const videoSchema = new mongoose.Schema({
     },
 });
 
-
+// Video 객체를 이용한 함수를 생성 -> video controller 에서 사용가능.
 videoSchema.static('formatHashtags', function(hashtags) {
     return hashtags.split(",").map((word) => (word.startsWith("#") ? word : `#${word}`))
 })

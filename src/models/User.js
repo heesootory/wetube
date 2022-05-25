@@ -12,9 +12,9 @@ const userSchema = new mongoose.Schema({
 })
 
 userSchema.pre('save', async function() {
-    console.log("User password:" , this.password);
+    //console.log("User password:" , this.password);
     this.password = await bcrypt.hash(this.password, 5);
-    console.log("Hashed password:" , this.password);
+    //console.log("Hashed password:" , this.password);
 })
 
 

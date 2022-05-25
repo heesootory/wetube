@@ -22,6 +22,7 @@ export const postJoin = async (req, res) => {
         });
     }
     try{
+        // DB에 저장
         await User.create({
             name,
             username,
@@ -166,6 +167,47 @@ export const postEdit = async (req,res)=>{
     }, {new: true});
     req.session.user = updatedUser;
     return res.redirect("/users/edit");
+}
+
+export const getChangePassword = (req, res) =>{
+    // 깃헙으로 로그인한 사람은 변경 불가. 
+    if(req.session.user.socialOnly === true){
+        return res.redirect("/");
+    }
+
+    return res.render("users/change-password", {pageTitle: "Change Password"})
+}
+export const postChangePassword = async (req, res) =>{
+    // 로그인 사용자 확인 후. form 데이터 가져오기
+    const {
+        session: {
+            user: { _id, password },
+        },
+        body : {oldPassword, newPassword, newPasswordConfirmation},
+    } = req;
+
+    const ok = await bcrypt.compare(oldPassword, password);
+    if(!ok){
+        return res.status(400).render("users/change-password", 
+            {pageTitle: "Change Password", 
+            errorMessage: "The current password is incorrect!"});
+    }
+    
+    //send notification
+    if(newPassword !== newPasswordConfirmation){
+        return res.status(400).render("users/change-password", 
+            {pageTitle: "Change Password", 
+            errorMessage: "The new Password does not match!"}
+        );
+    }
+    //DB PW 변경
+    const user = await User.findById(_id);
+    user.password = newPassword;
+    await user.save();
+    //session PW 변경
+    req.session.user.password = user.password;
+
+    return res.redirect("/users/logout");
 }
 
 export const see = (req, res) => res.send("See User");

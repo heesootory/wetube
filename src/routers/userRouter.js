@@ -3,7 +3,7 @@ import {
     logout, see, startGithubLogin, finishGithubLogin, getEdit, postEdit,
     getChangePassword, postChangePassword 
 } from "../controllers/userController.js";
-import {protectordMiddleware, publicOnlyMiddleware, uploadFiles} from "../middlewares";
+import {protectordMiddleware, publicOnlyMiddleware, avatarUpload} from "../middlewares";
 
 
 const userRouter = express.Router();
@@ -13,7 +13,7 @@ userRouter
     .route("/edit")
     .all(protectordMiddleware)
     .get(getEdit)
-    .post(uploadFiles.single("avatar") , postEdit);
+    .post(avatarUpload.single("avatar") , postEdit);
 userRouter
     .route("/change-password")
     .all(protectordMiddleware)

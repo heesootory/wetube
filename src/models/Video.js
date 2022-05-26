@@ -10,6 +10,7 @@ const videoSchema = new mongoose.Schema({
         views: {type: Number, default : 0},
         rating: {type: Number, default : 0},
     },
+    owner: {type: mongoose.Schema.Types.ObjectId, required: true, ref:"User"},
 });
 
 // Video 객체를 이용한 함수를 생성 -> video controller 에서 사용가능.

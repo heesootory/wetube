@@ -144,6 +144,7 @@ export const finishGithubLogin = async (req, res) => {
 
 export const logout = (req, res) => {
     req.session.destroy();
+    req.flash("error", "Not authorized");
     return res.redirect("/");
 }
 export const getEdit = (req, res) =>{
@@ -175,6 +176,7 @@ export const postEdit = async (req,res)=>{
 export const getChangePassword = (req, res) =>{
     // 깃헙으로 로그인한 사람은 변경 불가. 
     if(req.session.user.socialOnly === true){
+        req.flash("error", "Can't chenge password!");
         return res.redirect("/");
     }
 
@@ -209,7 +211,8 @@ export const postChangePassword = async (req, res) =>{
     await user.save();
     //session PW 변경
     req.session.user.password = user.password;
-
+    req.flash("info", "password updated!");
+    
     return res.redirect("/users/logout");
 }
 

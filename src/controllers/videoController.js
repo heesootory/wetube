@@ -29,6 +29,7 @@ export const getEdit = async (req, res) => {
     }
     console.log(typeof video.owner, typeof _id);
     if(String(video.owner) !== String(_id)){
+        req.flash("error", "you are not the owner of the video!");
         return res.status(403).redirect("/");
     }
     return res.render("edit", {pageTitle: `Edit ${video.title}` , video});
@@ -50,6 +51,7 @@ export const postEdit = async (req, res) => {
     await Video.findByIdAndUpdate(id, {
         title, description, hashtags: Video.formatHashtags(hashtags),
     });
+    req.flash("success", "changed saved!");
     return res.redirect(`/videos/${id}`);
 }
 

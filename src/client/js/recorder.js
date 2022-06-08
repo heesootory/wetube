@@ -1,5 +1,5 @@
 import { createFFmpeg, fetchFile} from "@ffmpeg/ffmpeg";
-const startBtn = document.getElementById("startBtn");
+const actionBtn = document.getElementById("actionBtn");
 const video = document.getElementById("preview");
 
 let stream;     // 영상
@@ -12,7 +12,19 @@ const files = {
     thumb : "thumbnail.jpg"
 }
 
+const downloadFile = (fileUrl, fileName) =>{
+    const a = document.createElement("a");
+    a.href = fileUrl;
+    a.download = fileName;     //anchor의 download속성
+    document.body.appendChild(a);
+    a.click();        //anchor를 누른효과.
+}
+
 const handleDownload = async () => {
+
+    actionBtn.removeEventListener("click", handleDownload);
+    actionBtn.innerText = "Transcording....";
+    actionBtn.disabled = true;
 
     const ffmpeg = createFFmpeg({corePath: 'https://unpkg.com/@ffmpeg/core@0.10.0/dist/ffmpeg-core.js', log : true});
     await ffmpeg.load();
@@ -24,47 +36,42 @@ const handleDownload = async () => {
     await ffmpeg.run("-i", files.input, "-ss", "00:00:01", "-frames:v" , "1", files.thumb);
 
     const mp4file = ffmpeg.FS("readFile", files.output);
-    const thumbfile = ffmpeg.FS("readFile", files.thumb);
+    const thumbfile = ffmpeg.FS("readFile", files.thumb); 
 
     const mp4Blob = new Blob([mp4file.buffer], {type : "video/mp4"});
     const thumbBlob = new Blob([thumbfile.buffer], {type: "image/jpg"});
 
-    const mp4URL = URL.createObjectURL(mp4Blob);
-    const thumbURL = URL.createObjectURL(thumbBlob);
+    const mp4Url = URL.createObjectURL(mp4Blob);
+    const thumbUrl = URL.createObjectURL(thumbBlob);
 
-    const a = document.createElement("a");
-    a.href = mp4URL;
-    a.download = "MyRecording.mp4";     //anchor의 download속성
-    document.body.appendChild(a);
-    a.click();        //anchor를 누른효과.
-
-    const thumba = document.createElement("a");
-    thumba.href = thumbURL;
-    thumba.download = "MyThumbnail.jpg";     //anchor의 download속성
-    document.body.appendChild(thumba);
-    thumba.click();        //anchor를 누른효과.
+    downloadFile(mp4Url, "MyRecording.mp4");
+    downloadFile(thumbUrl, "MyThumbnail.jpg");
 
     ffmpeg.FS("unlink", files.input);
     ffmpeg.FS("unlink", files.output);
     ffmpeg.FS("unlink", files.thumb);
 
     URL.revokeObjectURL(videoFile);
-    URL.revokeObjectURL(mp4URL);
-    URL.revokeObjectURL(thumbURL);
+    URL.revokeObjectURL(mp4Url);
+    URL.revokeObjectURL(thumbUrl);
+
+    actionBtn.innerText = "Recoring again";
+    actionBtn.disabled = false;
+    actionBtn.addEventListener("click", handleStart);
 }
 
 const handleStop = ()  => {
-    startBtn.innerText = "Download Recording";
-    startBtn.removeEventListener("click", handleStop);
-    startBtn.addEventListener("click", handleDownload);
+    actionBtn.innerText = "Download Recording";
+    actionBtn.removeEventListener("click", handleStop);
+    actionBtn.addEventListener("click", handleDownload);
 
     recorder.stop();
 };
 
 const handleStart = () => {
-    startBtn.innerText = "Stop Recording";
-    startBtn.removeEventListener("click", handleStart);
-    startBtn.addEventListener("click", handleStop);
+    actionBtn.innerText = "Stop Recording";
+    actionBtn.removeEventListener("click", handleStart);
+    actionBtn.addEventListener("click", handleStop);
     // 녹화
     recorder = new MediaRecorder(stream);
     recorder.ondataavailable = (event) => {
@@ -87,4 +94,4 @@ const init = async () => {  //녹화 X, preview
 };
 
 init();
-startBtn.addEventListener("click", handleStart)
+actionBtn.addEventListener("click", handleStart)

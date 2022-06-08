@@ -27,6 +27,13 @@ app.use(session({
     store: MongoStore.create({mongoUrl:process.env.DB_URL })
 }))
 
+// webassembly 에러 때문에 작성.
+app.use((req, res, next) => {
+    res.header("Cross-Origin-Embedder-Policy", "require-corp");
+    res.header("Cross-Origin-Opener-Policy", "same-origin");
+    next();
+    });
+
 app.use(localsMiddleware);
 app.use("/uploads", express.static("uploads"))
 app.use("/static", express.static("assets"))

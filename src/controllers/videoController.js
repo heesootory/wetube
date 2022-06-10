@@ -144,7 +144,7 @@ export const createComment = async (req, res) =>{
     const comment = await Comment.create({
         text,
         owner: user._id,
-        videos: id,
+        video: id,
     });
     
     video.comments.push(comment._id);

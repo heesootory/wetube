@@ -4,7 +4,7 @@ const commentSchema = new mongoose.Schema({
     text:  {type: String, required : true},
     createdAt: {type: Date, required: true, default : Date.now},
     owner : {type: mongoose.Schema.Types.ObjectId, required: true, ref: "User"},
-    videos : {type: mongoose.Schema.Types.ObjectId, required: true, ref : "Video"},
+    video : {type: mongoose.Schema.Types.ObjectId, required: true, ref : "Video"},
 });
 
 const Comment = mongoose.model("Comment",  commentSchema);

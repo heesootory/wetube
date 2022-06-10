@@ -1,8 +1,6 @@
 import User from "../models/User";
-import Video from "../models/Video";
 import fetch from "node-fetch";
 import bcrypt from 'bcrypt';
-import { trusted } from "mongoose";
 
 export const getJoin = (req, res) => 
     res.render("join", {pageTitle: "Join"});
@@ -143,8 +141,8 @@ export const finishGithubLogin = async (req, res) => {
 }
 
 export const logout = (req, res) => {
+    req.flash("info", "bye bye");
     req.session.destroy();
-    req.flash("error", "Not authorized");
     return res.redirect("/");
 }
 export const getEdit = (req, res) =>{
